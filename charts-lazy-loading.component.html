@@ -1,0 +1,10 @@
+<div id="prioritized-charts" v-if="chartsData">
+  <div v-for="chartData in chartsData" class="chart-wrapper">
+    <!-- loader -->
+    <div v-if="!chartData.values" class="chart-loader">
+    </div>
+    <!-- chart component -->
+    <chart-item v-else v-bind:cdata="chartData">
+    </chart-item>
+  </div>
+</div>
