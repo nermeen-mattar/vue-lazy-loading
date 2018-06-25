@@ -1,1 +1,51 @@
 
+#prioritized-charts {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.chart-wrapper {
+  background-color: #fefefe;
+  height: 300px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 20px;
+  padding: 20px;
+}
+
+.chart-loader {
+  border: 10px solid #d7e6e6;
+  border-radius: 50%;
+  border-top: 10px solid #009dc2;
+  width: 100px;
+  height: 100px;
+  -webkit-animation: load 1s linear infinite;
+  /* Safari */
+  animation: load 1s linear infinite;
+  margin: 0 auto;
+}
+
+
+/* Safari */
+
+@-webkit-keyframes load {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes load {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
