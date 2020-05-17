@@ -1,10 +1,31 @@
-<div id="prioritized-charts" v-if="chartsData">
-  <div v-for="chartData in chartsData" class="chart-wrapper">
-    <!-- loader -->
-    <div v-if="!chartData.values" class="chart-loader">
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title> Load by priorities</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+
+  <div id="prioritized-items-container" v-if="data">
+    <div v-for="entry in data" class="item-wrapper">
+      <!-- loader -->
+      <div v-if="!entry.type" class="item-loader">
+      </div>
+      <!-- chart component -->
+      <prioritized-item v-else v-bind:cdata="entry">
+      </prioritized-item>
     </div>
-    <!-- chart component -->
-    <chart-item v-else v-bind:cdata="chartData">
-    </chart-item>
   </div>
-</div>
+
+
+  <script src="https://unpkg.com/vue@2.6.11/dist/vue.js"></script>
+  <script src="https://unpkg.com/chart.js@2.7.1/dist/Chart.bundle.js"></script>
+  <script src="https://unpkg.com/chartkick@2.2.4/chartkick.js"></script>
+  <script src="https://unpkg.com/vue-chartkick@0.2.0/dist/vue-chartkick.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+  <script src="./charts-lazy-loading.component.js"></script>
+</body>
+
+</html>

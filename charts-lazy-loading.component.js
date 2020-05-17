@@ -1,76 +1,76 @@
-// charts component
-Vue.component('chart-item', {
+// items component
+Vue.component('prioritized-item', {
     props: ['cdata'],
-    template: ' <line-chart :data="cdata.values" v-if="cdata.type ==\'line\'"></line-chart><area-chart :data="cdata.values" v-else-if="cdata.type ==\'area\'"></area-chart><pie-chart :data="cdata.values" v-else-if="cdata.type ==\'pie\'"></pie-chart> <column-chart v-else :data="cdata.values"></column-chart>'
+    template: ' <line-chart :data="cdata.values" v-if="cdata.type ==\'line\'"></line-chart><area-chart :data="cdata.values" v-else-if="cdata.type ==\'area\'"></area-chart><img v-else-if="cdata.type== \'ad\'" :src="cdata.img"/><pie-chart :data="cdata.values" v-else-if="cdata.type ==\'pie\'"></pie-chart> <column-chart v-else :data="cdata.values"></column-chart>'
 })
 
-var prioritizedCharts = new Vue({
-    el: '#prioritized-charts',
+let prioritizer = new Vue({
+    el: '#prioritized-items-container',
     data: {
-        chartsData: [],
-        chartsPriorityData: []
+        data: [],
+        priorityData: []
     },
     methods: {
-        initChartsPrioritiesData: function() {
+        initItemsPrioritiesData: function() {
             this.$http.get('https://www.mocky.io/v2/5a218e4a2d00001c2be0037c')
                 .then(response => {
-                    prioritizedCharts.chartsPriorityData = response.body;
-                    prioritizedCharts.chartsPriorityData.forEach((cdata) => {
-                        prioritizedCharts.chartsData.push({}); // to view loaders until chart is ready
+                    prioritizer.priorityData = response.body;
+                    prioritizer.priorityData.forEach((cdata) => {
+                        prioritizer.data.push({}); // to view loaders until item is ready
                     });
-                    prioritizedCharts.getChartsByPriority();
+                    prioritizer.getItemsByPriority();
                 }, response => {
-                    console.log('Error getting charts priorities data');
+                    console.log('Error getting priorities data');
                 });
         },
-        getChartsByPriority: function() {
-            const copyChartsPriorities = prioritizedCharts.chartsPriorityData.slice();
+        getItemsByPriority: function() {
+            const copyPriorities = prioritizer.priorityData.slice();
             /* deep copy array but not inner objects (note: we will only modify the array)*/
-            copyChartsPriorities.sort((charta, chartb) => charta.priority > chartb.priority);
-            let chartIndex = 0;
+            copyPriorities.sort((itema, itemb) => itema.priority > itemb.priority);
+            let itemIndex = 0;
             const recursiveGet = (url) => {
                 /* look for same priorities */
-                while ((chartIndex < copyChartsPriorities.length - 1) &&
-                    copyChartsPriorities[chartIndex].priority === copyChartsPriorities[chartIndex + 1].priority) {
-                    chartIndex++;
-                    recursiveGet(chartsDataServices[copyChartsPriorities[chartIndex].order]);
+                while ((itemIndex < copyPriorities.length - 1) &&
+                    copyPriorities[itemIndex].priority === copyPriorities[itemIndex + 1].priority) {
+                    itemIndex++;
+                    recursiveGet(dataServices[copyPriorities[itemIndex].order]);
                 }
                 this.$http.get(url)
                     .then(response => {
-                        Vue.set(prioritizedCharts.chartsData,
+                        Vue.set(prioritizer.data,
                             response.body.order, response.body);
                         let waitForSamePriority = false;
-                        copyChartsPriorities.forEach((chart, index) => {
-                            if (chart.order === response.body.order) {
-                                waitForSamePriority = index > 0 && copyChartsPriorities[index - 1].priority === chart.priority || index < copyChartsPriorities.length && copyChartsPriorities[index + 1] === chart.priority;
-                                copyChartsPriorities.splice(index, 1); // remove data for the received chart 
-                                chartIndex--;
+                        copyPriorities.forEach((item, index) => {
+                            if (item.order === response.body.order) {
+                                waitForSamePriority = index > 0 && copyPriorities[index - 1].priority === item.priority || index < copyPriorities.length && copyPriorities[index + 1] === item.priority;
+                                copyPriorities.splice(index, 1); // remove data for the received item 
+                                itemIndex--;
                             }
                         });
-                        if (!waitForSamePriority && copyChartsPriorities.length) {
-                            chartIndex++;
-                            recursiveGet(chartsDataServices[copyChartsPriorities[0].order]);
+                        if (!waitForSamePriority && copyPriorities.length) {
+                            itemIndex++;
+                            recursiveGet(dataServices[copyPriorities[0].order]);
                         }
                     }, response => {
-                        console.log('Error getting chart data');
+                        console.log('Error getting item data');
                     });
             }
             /* zero to start with the heighest priority (this is the entry point to recursion) */
-            recursiveGet(chartsDataServices[copyChartsPriorities[0].order]);
+            recursiveGet(dataServices[copyPriorities[0].order]);
 
         }
     }
 })
 
-prioritizedCharts.initChartsPrioritiesData();
+prioritizer.initItemsPrioritiesData();
 
 // dummy services
-let chartsDataServices = [ // ordered by chart order
-    'https://www.mocky.io/v2/5a219e4e2d0000752ae0039e?mocky-delay=4000ms', //order: 0, priority: 2
-    'https://www.mocky.io/v2/5a21862b2d0000ef2ae0035d?mocky-delay=500ms', //order: 1 priority: 1 (most priority)
+let dataServices = [ // ordered by item order
+    'https://www.mocky.io/v2/5e2da40c3000008600e77d39?mocky-delay=4000ms', //order: 0, priority: 2
+    'https://www.mocky.io/v2/5e2da4ca300000ad34e77d3b?mocky-delay=500ms', //order: 1 priority: 1 (most priority)
     'https://www.mocky.io/v2/5a21865e2d0000eb2ae00360?mocky-delay=2500ms', //order: 2, priority: 3 (least priority)
     'https://www.mocky.io/v2/5a2186b82d0000f62ae00362?mocky-delay=200ms', //order: 3, priority: 3 (least priority)
-    /* note that eventhough chart 3 takes 200ms it is displayed before the last chart (chart 2) */
+    /* note that eventhough item 3 takes 200ms it is displayed before the last item (item 2) */
     'https://www.mocky.io/v2/5a2186e92d0000f82ae00364?mocky-delay=4000ms', //order: 4, priority: 2
     'https://www.mocky.io/v2/5a2185962d0000eb2ae00359?mocky-delay=4000ms' //order: 5, priority: 2
 ]
